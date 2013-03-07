@@ -64,7 +64,10 @@ _removeStaticJade = (mimosaConfig, options, next) ->
   next()
 
 _addStaticFilesToOutput = (mimosaConfig, options, next) ->
-  return next() unless options.files?.length > 0
+  return next() unless options.files?.length > 0 or options.staticJadeFiles?.length > 0
+
+  unless options.files?
+    options.files = []
 
   options.files = options.files.concat options.staticJadeFiles
   next()
