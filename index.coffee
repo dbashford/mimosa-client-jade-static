@@ -1,46 +1,70 @@
 "use strict"
 
+fs = require 'fs'
 jade = require 'jade'
-
+logger = require 'logmimosa'
 extensionRegex = /.html.[a-zA-Z]+$/
 
-registration = (mimosaConfig, register) ->
+exports.registration = (mimosaConfig, register) ->
   unless mimosaConfig.isVirgin
-    extensions = compilers?.extensionOverrides?.jade or ["jade"]
-    console.log "EXTENSION IS!!! #{extensions}"
+    extensions = mimosaConfig.compilers?.extensionOverrides?.jade or ["jade"]
+    register ['add','update','buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
+    register ['add','update','buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
+    register ['remove','cleanFile'],            'afterRead',    _removeStaticJade,             extensions
 
-    register ['cleanFile'],                               'init',         _removeFiles,                  extensions
-    register ['add','update','remove', 'buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
-    register ['add','update','remove', 'buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
+__outputFileName = (mimosaConfig, inputFileName) ->
+  inputFileName.replace(extensionRegex, '.html').replace(mimosaConfig.watch.sourceDir, mimosaConfig.watch.compiledDir)
+
+__isJadeStatic = (str) -> str.match extensionRegex
 
 _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
-  staticJadeFiles = []
+  return next() unless options.files?.length > 0
+
   files = options.files.filter (file) ->
-    _isJadeStatic file.inputFileName
+    __isJadeStatic file.inputFileName
 
-  options.files = options.files.filter (file) ->
-    not _isJadeStatic(file.inputFileName)
+  # if is jade static file, and the result of a single add/update
+  # then clean out options.files, don't want to compile templates
+  options.files = if options.inputFile? and __isJadeStatic options.inputFile
+    []
+  else
+    options.files.filter (file) ->
+      not __isJadeStatic(file.inputFileName)
 
-  options.staticJadeFiles = files.map (file) ->
-    funct = jade.compile file.inputFileText,
-      compileDebug: no,
-      filename: file.inputFileName
-    file.outputFileText = funct()
-    file.outputFileName = file.inputFileName.replace(extensionRegex, '.html').replace(mimosaConfig.sourceDir, mimosaConfig.compiledDir)
-    file
+  options.staticJadeFiles = files
+    .map (file) ->
+      file.outputFileName = __outputFileName(mimosaConfig, file.inputFileName)
+      file
+    .filter (file) ->
+      if fs.existsSync file.outputFileName
+        outStats = fs.statSync file.outputFileName
+        inStats = fs.statSync file.inputFileName
+        inStats.mtime > outStats.mtime
+      else
+        true
+    .map (file) ->
+      try
+        funct = jade.compile file.inputFileText, compileDebug: no, filename: file.inputFileName
+        file.outputFileText = funct()
+      catch err
+        logger.error err
+        file.outputFileText = null
+      file
 
   next()
 
-_isJadeStatic = (str) -> str.match extensionRegex
-
-_removeFiles = (mimosaConfig, options, next) ->
-  console.log "CLEAN"
-  console.log options
+_removeStaticJade = (mimosaConfig, options, next) ->
+  if __isJadeStatic options.inputFile
+    # removed file was a static file, don't need to compile templates too
+    options.files = []
+    outputFileName = __outputFileName mimosaConfig, options.inputFile
+    if fs.existsSync outputFileName
+      fs.unlinkSync outputFileName
+      logger.success "Deleted file [[ #{outputFileName} ]] "
   next()
 
 _addStaticFilesToOutput = (mimosaConfig, options, next) ->
+  return next() unless options.files?.length > 0
+
   options.files = options.files.concat options.staticJadeFiles
   next()
-
-module.exports =
-  registration:    registration
