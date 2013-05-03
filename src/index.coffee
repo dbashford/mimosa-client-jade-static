@@ -18,7 +18,8 @@ __outputFileName = (mimosaConfig, inputFileName) ->
 __isJadeStatic = (str) -> str.match extensionRegex
 
 _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
-  return next() unless options.files?.length > 0
+  hasFiles = options.files?.length > 0
+  return next() unless hasFiles
 
   files = options.files.filter (file) ->
     __isJadeStatic file.inputFileName

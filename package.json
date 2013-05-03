@@ -1,6 +1,6 @@
 {
   "name": "mimosa-client-jade-static",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/dbashford/mimosa-client-jade-static",
   "author": "David Bashford",
   "description": "A mimosa module to use jade to create HTML client templates",
@@ -22,11 +22,15 @@
     "html"
   ],
   "dependencies": {
-    "jade": "0.28.1",
+    "jade": "0.30.0",
     "logmimosa": "0.4.0"
   },
   "license": "MIT",
   "engines": {
     "node": ">=0.8"
+  },
+  "main": "./lib/index",
+  "scripts": {
+    "prepublish": "mimosa build"
   }
 }
