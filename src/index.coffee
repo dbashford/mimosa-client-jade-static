@@ -6,11 +6,10 @@ logger = require 'logmimosa'
 extensionRegex = /.html.[a-zA-Z]+$/
 
 exports.registration = (mimosaConfig, register) ->
-  unless mimosaConfig.isVirgin
-    extensions = mimosaConfig.compilers?.extensionOverrides?.jade or ["jade"]
-    register ['add','update','buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
-    register ['add','update','buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
-    register ['remove','cleanFile'],            'afterRead',    _removeStaticJade,             extensions
+  extensions = mimosaConfig.compilers?.extensionOverrides?.jade or ["jade"]
+  register ['add','update','buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
+  register ['add','update','buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
+  register ['remove','cleanFile'],            'afterRead',    _removeStaticJade,             extensions
 
 __outputFileName = (mimosaConfig, inputFileName) ->
   inputFileName.replace(extensionRegex, '.html').replace(mimosaConfig.watch.sourceDir, mimosaConfig.watch.compiledDir)
