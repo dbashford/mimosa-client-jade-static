@@ -1,11 +1,15 @@
 "use strict"
 
 fs = require 'fs'
+
 jade = require 'jade'
 logger = require 'logmimosa'
+
+config = './config'
+
 extensionRegex = /.html.[a-zA-Z]+$/
 
-exports.registration = (mimosaConfig, register) ->
+registration = (mimosaConfig, register) ->
   extensions = mimosaConfig.compilers?.extensionOverrides?.jade or ["jade"]
   register ['add','update','buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
   register ['add','update','buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
@@ -45,7 +49,7 @@ _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
     .map (file) ->
       try
         funct = jade.compile file.inputFileText, compileDebug: no, filename: file.inputFileName
-        file.outputFileText = funct()
+        file.outputFileText = funct mimosaConfig.clientJadeStatic.context
       catch err
         logger.error err
         file.outputFileText = null
@@ -71,3 +75,9 @@ _addStaticFilesToOutput = (mimosaConfig, options, next) ->
 
   options.files = options.files.concat options.staticJadeFiles
   next()
+
+module.exports =
+  registration: registration
+  defaults:     config.defaults
+  placeholder:  config.placeholder
+  validate:     config.validate

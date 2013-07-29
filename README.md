@@ -15,10 +15,13 @@ If you have static HTML templates used in your web app, this module allows you t
 
 This module will detect any files with a double extension of `.html.jade`, compile those jade templates, and then execute the jade template resulting in html. That html will be placed in `compiledDir` at the same file location as the original file in `sourceDir` but without the `.jade` at the end of the file name.
 
-The `.html.jade` files cannot have any dynamic pieces in it, if it does, the function execution will fail.
-
 This module also handles deletes and cleans of static jade assets.
 
 ## Default Config
 
-There is no config for this module.
+```
+clientJadeStatic:
+   context:{}
+```
+
+* `context`: An object of data to be passed into jade compilation.  Use this to define the values for any variables that may be in the `.html.jade` files. Make this object as big as it needs to be to satisfy the needs of your jade files.
