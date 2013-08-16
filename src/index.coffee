@@ -9,14 +9,18 @@ config = './config'
 
 extensionRegex = /.html.[a-zA-Z]+$/
 
+outputExtension = '.html'
+
 registration = (mimosaConfig, register) ->
   extensions = mimosaConfig.compilers?.extensionOverrides?.jade or ["jade"]
+  extensionRegex = mimosaConfig.clientJadeStatic?.extensionRegex ? extensionRegex
+  outputExtension = mimosaConfig.clientJadeStatic?.outputExtension ? outputExtension
   register ['add','update','buildExtension'], 'afterRead',    _pullStaticFilesOutAndCompile, extensions
   register ['add','update','buildExtension'], 'afterCompile', _addStaticFilesToOutput,       extensions
   register ['remove','cleanFile'],            'afterRead',    _removeStaticJade,             extensions
 
 __outputFileName = (mimosaConfig, inputFileName) ->
-  inputFileName.replace(extensionRegex, '.html').replace(mimosaConfig.watch.sourceDir, mimosaConfig.watch.compiledDir)
+  inputFileName.replace(extensionRegex, outputExtension).replace(mimosaConfig.watch.sourceDir, mimosaConfig.watch.compiledDir)
 
 __isJadeStatic = (str) -> str.match extensionRegex
 
