@@ -4,6 +4,7 @@ exports.defaults = ->
   clientJadeStatic:
     outputExtension: '.html'
     extensionRegex: /.html.[a-zA-Z]+$/
+    prettyOutput: false
     context:{}
 
 
@@ -22,6 +23,8 @@ exports.placeholder = ->
       # extensionRegex: /.html.[a-zA-Z]+$/  # The regex to use to match jade files to be compiled
                                             # Files must still end in .jade or in whatever the
                                             # compiler override is for the jade compiler.
+      # prettyOutput: false                 # Indicates if the Jade compiler should output 
+                                            # pretty-indentation whitespace
   """
 
 exports.validate = (config, validators) ->
@@ -36,5 +39,7 @@ exports.validate = (config, validators) ->
     if validators.ifExistsIsString(errors, "clientJadeStatic.outputExtension", config.clientJadeStatic.outputExtension)
       if config.clientJadeStatic.outputExtension.indexOf('.') isnt 0
         config.clientJadeStatic.outputExtension = "." + config.clientJadeStatic.outputExtension
+
+    validators.ifExistsIsBoolean(errors, "clientJadeStatic.prettyOutput", config.clientJadeStatic.prettyOutput)
 
   errors

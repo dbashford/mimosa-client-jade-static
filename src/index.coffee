@@ -50,7 +50,10 @@ _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
         true
     .map (file) ->
       try
-        funct = jade.compile file.inputFileText, compileDebug: no, filename: file.inputFileName
+        funct = jade.compile file.inputFileText, 
+          compileDebug: no 
+          filename: file.inputFileName 
+          pretty: mimosaConfig.clientJadeStatic.prettyOutput
         file.outputFileText = funct mimosaConfig.clientJadeStatic.context
       catch err
         logger.error err
