@@ -3,7 +3,7 @@ mimosa-client-jade-static
 
 ## Overview
 
-For more information regarding Mimosa, see http://mimosajs.com
+For more information regarding Mimosa, see http://mimosa.io
 
 ## Usage
 
