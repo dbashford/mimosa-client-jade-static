@@ -17,6 +17,8 @@ This module will detect any files with a double extension of `.html.jade`, compi
 
 This module also handles deletes and cleans of static jade assets.
 
+Note: If you are optimizing your JavaScript using `mimosa-minify` or `mimosa-minify-js` or something similar, then you may get odd messages about minification failing on your compiled Jade files.  Nothing bad is happening, so if you are ok with the messages, you can do nothing.  Another option is to add `/.html$/` to the `minify[JS].exclude` array. This will prevent the `minify` modules from attempting to minify the HTML output of this module. See [this Mimosa issue](https://github.com/dbashford/mimosa/issues/320) for more details.
+
 ## Default Config
 
 ```
