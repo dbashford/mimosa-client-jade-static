@@ -7,7 +7,9 @@ For more information regarding Mimosa, see http://mimosa.io
 
 ## Usage
 
-Add `'client-jade-static'` to your list of modules.  That's all!  Mimosa will install the module for you when you start up.
+Add `'client-jade-static'` and "`jade`" to your list of modules.  That's all!  Mimosa will install the module for you when you start up.
+
+As of Mimosa `2.0` `jade` must be a module of your app for this to work as Mimosa no longer supports jade right out of the box.
 
 ## Functionality
 
