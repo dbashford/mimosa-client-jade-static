@@ -3,7 +3,6 @@
 fs = require 'fs'
 
 jade = require 'jade'
-logger = require 'logmimosa'
 
 config = require './config'
 extensionRegex = null
@@ -50,13 +49,13 @@ _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
         true
     .map (file) ->
       try
-        funct = jade.compile file.inputFileText, 
-          compileDebug: no 
-          filename: file.inputFileName 
+        funct = jade.compile file.inputFileText,
+          compileDebug: no
+          filename: file.inputFileName
           pretty: mimosaConfig.clientJadeStatic.prettyOutput
         file.outputFileText = funct mimosaConfig.clientJadeStatic.context
       catch err
-        logger.error err
+        mimosaConfig.log.error err
         file.outputFileText = null
       file
 
@@ -69,7 +68,7 @@ _removeStaticJade = (mimosaConfig, options, next) ->
     outputFileName = __outputFileName mimosaConfig, options.inputFile
     if fs.existsSync outputFileName
       fs.unlinkSync outputFileName
-      logger.success "Deleted file [[ #{outputFileName} ]] "
+      mimosaConfig.log.success "Deleted file [[ #{outputFileName} ]] "
   next()
 
 _addStaticFilesToOutput = (mimosaConfig, options, next) ->
