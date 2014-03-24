@@ -55,7 +55,7 @@ _pullStaticFilesOutAndCompile = (mimosaConfig, options, next) ->
           pretty: mimosaConfig.clientJadeStatic.prettyOutput
         file.outputFileText = funct mimosaConfig.clientJadeStatic.context
       catch err
-        mimosaConfig.log.error err
+        mimosaConfig.log.error err, {exitIfBuild:true}
         file.outputFileText = null
       file
 
